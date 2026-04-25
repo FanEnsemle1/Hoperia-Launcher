@@ -1,20 +1,26 @@
-# module du helios launcher
 name: Launcher Build
 on:
   push:
     branches: [ master ]
 
+permissions:
+  contents: write
+
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Get version
-        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+        id: get_version
+        run: |
+          VERSION=$(jq -r .version package.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_ENV
       
       - name: Create Release
         id: create_release
@@ -22,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.version }}
+          tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
           draft: false
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
@@ -30,9 +36,6 @@ jobs:
   build-launcher:
     needs: create-release
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: write 
-    # -----------------------------------------
     strategy:
       matrix:
         os: [macos-14, ubuntu-latest, windows-2022]
@@ -44,7 +47,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -55,9 +58,8 @@ jobs:
         run: npm ci
         shell: bash
 
-      - name: Build
+      - name: Build and Publish
         env:
-          # On utilise GITHUB_TOKEN (majuscules) qui est fourni par défaut
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build -- --publish always
         shell: bash

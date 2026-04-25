@@ -1,10 +1,10 @@
 {
     "name": "hoperia",
     "preductname": "Hoperia Launcher",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Launcher officiel d'Hoperia",
     "main": "src/app.js",
-    "author": "Riptiaz/Boulldogo/Vexato/Luuxis",
+    "author": "Hoperia, Riptiaz/Boulldogo/Vexato/Luuxis",
     "env": "panel",
     "settings": "https://panel.hoperia.fr/",
     "scripts": {
