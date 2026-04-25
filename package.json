@@ -1,7 +1,7 @@
 {
     "name": "hoperia",
     "preductname": "Hoperia Launcher",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Launcher officiel d'Hoperia",
     "main": "src/app.js",
     "author": "Riptiaz/Boulldogo/Vexato/Luuxis",
