@@ -1,22 +1,25 @@
+# module du helios launcher
 name: Launcher Build
-
 on:
   push:
     branches: [ master ]
 
-permissions:
-  contents: write
-
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    # Ajout des permissions pour autoriser la création de la release
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Get version
+        id: get_version
         run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
       
       - name: Create Release
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,19 +37,25 @@ jobs:
         os: [macos-14, ubuntu-latest, windows-2022]
 
     steps:
-      - uses: actions/checkout@v1
+      - name: Check out Git repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: 3.x
 
-      - run: npm ci
+      - name: Install Dependencies
+        run: npm ci
+        shell: bash
 
       - name: Build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build
+        shell: bash
